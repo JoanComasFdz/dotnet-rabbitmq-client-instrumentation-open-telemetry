@@ -90,7 +90,7 @@ public record MyEvent : IEvent
                 this._eventPublisher.Publish(new MyEvent())
             }
         }
-```
+        ```
 
 ### Subscribe to an event
 1. Create a class to inherit from `IEventSubscription<MyEvent>`:
