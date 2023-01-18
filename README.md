@@ -124,4 +124,4 @@ The `RabbitMQSubscriberHostedService` uses it to start processing the event and 
 Looks like MassTransit is using a different approach, so its worth exploring:
 - https://masstransit-project.com/advanced/monitoring/diagnostic-source.html
 - https://github.com/alexeyzimarev/ndc-2020-talk-tracetrace/
-- [![OpenMetrics, OpenTracing, OpenTelemetry - are we there yet? - Alexey Zimarev - NDC Oslo 2020](https://www.youtube.com/watch?v=0vl-4OhPyQY/0.jpg)](https://www.youtube.com/watch?v=0vl-4OhPyQY)
+- [![OpenMetrics, OpenTracing, OpenTelemetry - are we there yet? - Alexey Zimarev - NDC Oslo 2020](https://img.youtube.com/vi/0vl-4OhPyQY/0.jpg)](https://www.youtube.com/watch?v=0vl-4OhPyQY)
