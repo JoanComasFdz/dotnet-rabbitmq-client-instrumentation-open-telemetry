@@ -16,21 +16,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure important OpenTelemetry settings, the console exporter, and instrumentation library
 // IMPORTANT: DO NOT USE THE NEW METHODS, THEY DO NOT WORK
-builder.Services.AddOpenTelemetryTracing(tracerProviderBuilder =>
-{
-    tracerProviderBuilder
-        .AddOtlpExporter(opt =>
-        {
-            opt.Protocol = OtlpExportProtocol.HttpProtobuf;
-        })
+builder.Services.AddOpenTelemetry().
+    WithTracing(builder => builder
         .AddSource(serviceName)
-        .SetResourceBuilder(ResourceBuilder.CreateDefault()
-            .AddService(serviceName, serviceVersion))
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
+        .SetResourceBuilder(ResourceBuilder.CreateDefault()
+            .AddService(serviceName, serviceVersion))
+        .AddConsoleExporter() // For debugging purposes
+        .AddOtlpExporter(options =>
+        {
+            options.Protocol = OtlpExportProtocol.HttpProtobuf;
+        })
         .AddSqlClientInstrumentation()
-        .AddRabbitMqInstrumentation();
-});
+        .AddRabbitMqInstrumentation()
+        );
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
