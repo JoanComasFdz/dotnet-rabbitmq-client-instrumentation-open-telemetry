@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using InstrumentedRabbitMqDotNetClient.Contracts;
+﻿using InstrumentedRabbitMqDotNetClient.Contracts;
 
 namespace InstrumentedRabbitMqDotNetClient.TestApplication
 {
