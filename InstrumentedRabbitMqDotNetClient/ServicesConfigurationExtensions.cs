@@ -43,23 +43,33 @@ namespace InstrumentedRabbitMqDotNetClient
         public static void AddRabbitMQSubscriberHostedService(this IServiceCollection services, string queueName)
         {
             var rabbitMQConfiguration = GetRabbitMQConfiguration(queueName);
-
-            RegisterEventSubscriptions(services);
-
             services.AddSingleton(rabbitMQConfiguration);
-            services.AddSingleton<IChannelProvider, ChannelProvider>();
-            services.AddSingleton<IEventSubscriptionFactory, EventSubscriptionFactory>();
-            services.AddSingleton<IFluentConnector, FluentConnector>();
+
+            // Tracing
+            services.AddTransient<IRabbitMQDiagnosticSource, RabbitMQDiagnosticSource>();
+
+            // Connection
             services.AddSingleton<IConnectionFactory>(new ConnectionFactory
             {
                 HostName = rabbitMQConfiguration.Host,
                 UserName = rabbitMQConfiguration.User,
                 Password = rabbitMQConfiguration.Password
             });
-            services.AddScoped<IEventPublisher, EventPublisher>();
-            services.AddTransient<IRabbitMQDiagnosticSource, RabbitMQDiagnosticSource>();
+            services.AddSingleton<IFluentConnector, FluentConnector>();
             services.AddSingleton<IConnectionManager, ConnectionManager>();
+            services.AddHostedService<RabbitMQInitializerHostedService>();
+
+            // Subscribing
+            services.RegisterEventSubscriptions();
+            services.AddSingleton<IEventSubscriptionFactory, EventSubscriptionFactory>();
+            services.AddSingleton<SubscribingChannel>();
+            services.AddSingleton<ISubscribingChannel>(p =>p.GetRequiredService<SubscribingChannel>());
             services.AddHostedService<RabbitMQSubscriberHostedService>();
+
+            // Publishing
+            services.AddSingleton<PublishingChannel>();
+            services.AddSingleton<IPublishingChannel>(p => p.GetRequiredService<Publishing.PublishingChannel>());
+            services.AddScoped<IEventPublisher, EventPublisher>();
         }
 
         /// <summary>
@@ -92,7 +102,7 @@ namespace InstrumentedRabbitMqDotNetClient
             return rabbitMQConfiguration;
         }
 
-        private static void RegisterEventSubscriptions(IServiceCollection services)
+        private static void RegisterEventSubscriptions(this IServiceCollection services)
         {
             var typesToRegister = EventSubscriptionSearcher.GetEventSubscriptionTypes();
 
