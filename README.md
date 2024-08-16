@@ -128,7 +128,7 @@ Looks like MassTransit is using a different approach, so its worth exploring:
 
 ### Features
 - [x] Upgrade to .NET8.
+- [x] Reuse same connection in both publishing and subscribing.
 - [ ] Rename to `JoanComasFdz.RabbitMQ`.
-- [ ] Reuse same connection in both publishing and subscribing.
 - [ ] Allow publishing to different exchanges.
 - [ ] IEvent should follow cloud standard events.
