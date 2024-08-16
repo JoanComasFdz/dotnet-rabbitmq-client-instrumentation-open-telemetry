@@ -5,7 +5,7 @@ using RabbitMQ.Client;
 using InstrumentedRabbitMqDotNetClient.Contracts;
 using InstrumentedRabbitMqDotNetClient.Instrumentation;
 using InstrumentedRabbitMqDotNetClient.Publishing;
-using InstrumentedRabbitMqDotNetClient.Subscription;
+using InstrumentedRabbitMqDotNetClient.Subscribing;
 using OpenTelemetry.Trace;
 
 namespace InstrumentedRabbitMqDotNetClient

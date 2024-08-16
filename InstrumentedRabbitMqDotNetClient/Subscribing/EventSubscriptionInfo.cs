@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace InstrumentedRabbitMqDotNetClient.Subscription;
+namespace InstrumentedRabbitMqDotNetClient.Subscribing;
 
 internal record EventSubscriptionInfo
 {

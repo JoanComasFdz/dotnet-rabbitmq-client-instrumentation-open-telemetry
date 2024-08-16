@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using InstrumentedRabbitMqDotNetClient;
 using RabbitMQ.Client;
-using InstrumentedRabbitMqDotNetClient.Subscription;
+using InstrumentedRabbitMqDotNetClient.Subscribing;
 using InstrumentedRabbitMqDotNetClient.Publishing;
 
 internal class RabbitMQInitializerHostedService(
@@ -39,5 +39,4 @@ internal class RabbitMQInitializerHostedService(
         // No need to close the connection, it is handled by the ConnectionManager
         return Task.CompletedTask;
     }
-
 }

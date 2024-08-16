@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using InstrumentedRabbitMqDotNetClient.Contracts;
 
-namespace InstrumentedRabbitMqDotNetClient.Subscription;
+namespace InstrumentedRabbitMqDotNetClient.Subscribing;
 
 internal class EventSubscriptionWrapper : IEventSubscription<IEvent>
 {

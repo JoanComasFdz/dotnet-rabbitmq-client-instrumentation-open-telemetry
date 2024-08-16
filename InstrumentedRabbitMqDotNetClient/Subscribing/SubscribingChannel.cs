@@ -1,6 +1,6 @@
 ﻿using RabbitMQ.Client;
 
-namespace InstrumentedRabbitMqDotNetClient.Subscription;
+namespace InstrumentedRabbitMqDotNetClient.Subscribing;
 
 internal interface ISubscribingChannel
 {
