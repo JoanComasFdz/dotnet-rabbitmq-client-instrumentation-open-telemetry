@@ -37,7 +37,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRabbitMQSubscriberHostedService(serviceName);
+builder.Services.AddRabbitMQ(serviceName);
 
 var app = builder.Build();
 

@@ -23,7 +23,7 @@ namespace InstrumentedRabbitMqDotNetClient
         /// </para>
         /// <para>
         /// <remarks>
-        /// This method must be called in the <c>Startup.ConfigureServices()</c> method of your micro service.
+        /// This method must be called in the <c>Startup.ConfigureServices()</c> method or <c>Program.cs</c> of your ASP .Net Core application.
         /// </remarks>
         /// </para>
         /// <para>
@@ -40,7 +40,7 @@ namespace InstrumentedRabbitMqDotNetClient
         /// </summary>
         /// <param name="services">The service collection where to register RabbitMQ.</param>
         /// <param name="queueName">The name of the queue where to read events from.</param>
-        public static void AddRabbitMQSubscriberHostedService(this IServiceCollection services, string queueName)
+        public static void AddRabbitMQ(this IServiceCollection services, string queueName)
         {
             var rabbitMQConfiguration = GetRabbitMQConfiguration(queueName);
             services.AddSingleton(rabbitMQConfiguration);
@@ -73,15 +73,16 @@ namespace InstrumentedRabbitMqDotNetClient
         }
 
         /// <summary>
-        /// Enables RabbitMQ instrumentation.
+        /// Enables this RabbitMQ library to configue the traces properly.
         /// <para>
         /// <remarks>
-        /// This method must be called in the <c>Startup.cs<c> in the </c>builder.Services.AddOpenTelemetryTracing()</c> method of your micro service.
+        /// This method must be called in the <c>Startup.cs</c> or <c>Program.cs</c> of your ASP .Net Core application,
+        /// in the <c>builder.Services.AddOpenTelemetry().WithTracing(builder => ...)</c> method.
         /// </remarks>
         /// </para>
         /// </summary>
         /// <param name="builder"></param>
-        /// <returns></returns>
+        /// <returns>The same instance of the <see cref="TracerProviderBuilder"/> that was passed as parameter.</returns>
         public static TracerProviderBuilder AddRabbitMqInstrumentation(this TracerProviderBuilder builder)
         {
             builder.AddSource(RabbitMQDiagnosticSource.RabbitMQDiagnosticSourceName);
