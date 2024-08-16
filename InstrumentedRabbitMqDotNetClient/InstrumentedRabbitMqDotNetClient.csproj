@@ -6,7 +6,7 @@
     <Version>5.5.0</Version>
     <Authors>JoanComas Team</Authors>
     <Company></Company>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>.NET 5 Version</PackageReleaseNotes>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
