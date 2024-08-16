@@ -31,26 +31,23 @@ docker run -d --name jaeger -e COLLECTOR_ZIPKIN_HOST_PORT=9411 -e COLLECTOR_OTLP
 1. In the `Program` class, add `AddRabbitMqInstrumentation()` to your existing OpenTelemetry code:
 
 ```csharp
-builder.Services.AddOpenTelemetryTracing(tracerProviderBuilder =>
+builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 {
     tracerProviderBuilder
-        .AddOtlpExporter(opt =>
-        {
-            opt.Protocol = OtlpExportProtocol.HttpProtobuf;
-        })
+        .AddOtlpExporter(opt => ...)
         .AddSource(serviceName)
         .SetResourceBuilder(ResourceBuilder.CreateDefault()
             .AddService(serviceName, serviceVersion))
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
-        .AddSqlClientInstrumentation()
+        ...
         .AddRabbitMqInstrumentation(); // <- This line
 });
 ```
 
 2. Afterwards, add the following line:
 ```csharp
-builder.Services.AddRabbitMQSubscriberHostedService(serviceName);
+builder.Services.AddRabbitMQ(serviceName);
 ```
 
 ### Create an event
