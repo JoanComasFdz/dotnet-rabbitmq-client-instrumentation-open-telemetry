@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace InstrumentedRabbitMqDotNetClient.Subscription
+namespace InstrumentedRabbitMqDotNetClient.Subscribing;
+
+internal interface IEventSubscriptionFactory
 {
-    internal interface IEventSubscriptionFactory
-    {
-        IEnumerable<string> EventNames { get; }
+    IEnumerable<string> EventNames { get; }
 
-        EventSubscriptionWrapper CreateEventBusSubscription(IServiceProvider serviceProvider, string eventName);
+    EventSubscriptionWrapper CreateEventBusSubscription(IServiceProvider serviceProvider, string eventName);
 
-        Type GetEventType(string eventName);
-    }
+    Type GetEventType(string eventName);
 }
