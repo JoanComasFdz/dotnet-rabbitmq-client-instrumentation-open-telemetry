@@ -21,7 +21,7 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
             var typesToRegister = EventSubscriptionSearcher.GetEventSubscriptionTypes();
             SaveTypesAsSubscriptions(typesToRegister);
         }
-        
+
         private void SaveTypesAsSubscriptions(IEnumerable<Type> typesToRegister)
         {
             foreach (var subscriptionType in typesToRegister)

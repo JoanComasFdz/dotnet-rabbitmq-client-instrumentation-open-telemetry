@@ -1,5 +1,4 @@
-﻿using System;
-using InstrumentedRabbitMqDotNetClient.Contracts;
+﻿using InstrumentedRabbitMqDotNetClient.Contracts;
 
 namespace InstrumentedRabbitMqDotNetClient.TestApplication
 {
