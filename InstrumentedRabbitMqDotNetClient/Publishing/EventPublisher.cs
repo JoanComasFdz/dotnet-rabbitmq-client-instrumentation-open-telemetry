@@ -12,7 +12,7 @@ namespace InstrumentedRabbitMqDotNetClient.Publishing
     internal class EventPublisher : IEventPublisher
     {
         private readonly RabbitMQConfiguration _configuration;
-        private readonly IChannelProvider _channelProvider;
+        private readonly IPublishingChannel _publishingChannel;
         private readonly ILogger<EventPublisher> _logger;
         private readonly IBasicProperties _basicProperties;
         private readonly IRabbitMQDiagnosticSource _rabbitMQDiagnosticSource;
@@ -20,15 +20,15 @@ namespace InstrumentedRabbitMqDotNetClient.Publishing
         public EventPublisher(
             ILoggerFactory loggerFactory,
             RabbitMQConfiguration configuration,
-            IChannelProvider channelProvider,
+            IPublishingChannel channelProvider,
             IRabbitMQDiagnosticSource rabbitMQDiagnosticSource)
         {
             _configuration = configuration;
-            _channelProvider = channelProvider;
+            _publishingChannel = channelProvider;
             _rabbitMQDiagnosticSource = rabbitMQDiagnosticSource;
             _logger = loggerFactory.CreateLogger<EventPublisher>();
 
-            _basicProperties = _channelProvider.GetChannel().CreateBasicProperties();
+            _basicProperties = _publishingChannel.Channel.CreateBasicProperties();
             _basicProperties.Headers = new Dictionary<string, object>();
         }
 
@@ -55,8 +55,8 @@ namespace InstrumentedRabbitMqDotNetClient.Publishing
 
             try
             {
-                _channelProvider
-                    .GetChannel()
+                _publishingChannel
+                    .Channel
                     .BasicPublish(
                         _configuration.Exchange,
                         theEvent.EventName,
