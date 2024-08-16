@@ -20,11 +20,10 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly IEventSubscriptionFactory _eventSubscriptionFactory;
-        private readonly IFluentConnector _connector;
+        private readonly IConnectionManager _connectionManager;
         private readonly IRabbitMQDiagnosticSource _rabbitMQDiagnosticSource;
 
-        private IConnection _connection;
-        private IModel _channel;
+        private IModel _subscriptionChannel;
         private EventingBasicConsumer _consumer;
 
         public RabbitMQSubscriberHostedService(
@@ -32,14 +31,14 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
             ILoggerFactory loggerFactory,
             IServiceProvider serviceProvider,
             IEventSubscriptionFactory eventSubscriptionFactory,
-            IFluentConnector connector,
+            IConnectionManager connectionManager,
             IRabbitMQDiagnosticSource rabbitMQDiagnosticSource)
         {
             _configuration = configuration;
             _logger = loggerFactory.CreateLogger<RabbitMQSubscriberHostedService>();
             _serviceProvider = serviceProvider;
             _eventSubscriptionFactory = eventSubscriptionFactory;
-            _connector = connector;
+            _connectionManager = connectionManager;
             _rabbitMQDiagnosticSource = rabbitMQDiagnosticSource;
         }
 
@@ -60,16 +59,11 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
         {
             _logger.LogDebug("Connecting to RabbitMQ...");
 
-            _connection = _connector
-                .TryFor(TimeSpan.FromMinutes(3))
-                .RetryEvery(TimeSpan.FromSeconds(10))
-                .Connect();
-
-            _channel = _connection.CreateModel();
-            _channel.ExchangeDeclare(exchange: _configuration.Exchange, type: ExchangeType.Topic, true);
-            _channel.QueueDeclare(_configuration.QueueName, true, false);
-            _channel.BasicQos(0, 1, false);
-            _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
+            _subscriptionChannel = _connectionManager.Connection.CreateModel();
+            _subscriptionChannel.ExchangeDeclare(exchange: _configuration.Exchange, type: ExchangeType.Topic, true);
+            _subscriptionChannel.QueueDeclare(_configuration.QueueName, true, false);
+            _subscriptionChannel.BasicQos(0, 1, false);
+            _connectionManager.Connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
 
             _logger.LogInformation("Connected to RabbitQM at '{Host}' exchange '{Exchange}' queue '{QueueName}'.",
                 _configuration.Host,
@@ -80,14 +74,14 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
         private void ConfigureConsumer()
         {
             _logger.LogDebug("Configuring consumer...");
-            _consumer = new EventingBasicConsumer(_channel);
+            _consumer = new EventingBasicConsumer(_subscriptionChannel);
             _consumer.Received += ReceivedEventHandler;
             _consumer.Shutdown += OnConsumerShutdown;
             _consumer.Registered += OnConsumerRegistered;
             _consumer.Unregistered += OnConsumerUnregistered;
             _consumer.ConsumerCancelled += OnConsumerConsumerCancelled;
 
-            _channel.BasicConsume(_configuration.QueueName, false, _consumer);
+            _subscriptionChannel.BasicConsume(_configuration.QueueName, false, _consumer);
 
             _logger.LogDebug("Consumer configured.");
         }
@@ -100,7 +94,7 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
                     _configuration.QueueName,
                     _configuration.Exchange,
                     eventName);
-                _channel.QueueBind(queue: _configuration.QueueName, exchange: _configuration.Exchange, routingKey: eventName);
+                _subscriptionChannel.QueueBind(queue: _configuration.QueueName, exchange: _configuration.Exchange, routingKey: eventName);
             }
 
             _logger.LogInformation("All event subscriptions bound!");
@@ -128,7 +122,7 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
             HandleMessage(operationId, eventName, message)
                 .ContinueWith(a =>
                 {
-                    _channel.BasicAck(ea.DeliveryTag, false);
+                    _subscriptionChannel.BasicAck(ea.DeliveryTag, false);
                     _rabbitMQDiagnosticSource.Stop(activity, a.IsFaulted);
                     _logger.LogDebug("Finished processing {eventName} on Operation Id {OperationId} and Parent Operation Id.", eventName, operationId);
                 });
@@ -169,10 +163,10 @@ namespace InstrumentedRabbitMqDotNetClient.Subscription
             _consumer.Unregistered -= OnConsumerUnregistered;
             _consumer.ConsumerCancelled -= OnConsumerConsumerCancelled;
 
-            _connection.ConnectionShutdown -= RabbitMQ_ConnectionShutdown;
+            _connectionManager.Connection.ConnectionShutdown -= RabbitMQ_ConnectionShutdown;
 
-            _channel.Close();
-            _connection.Close();
+            _subscriptionChannel.Close();
+            _connectionManager.Connection.Close();
 
             _logger.LogInformation("InstrumentedRabbitMqDotNetClient is disposed.");
             base.Dispose();

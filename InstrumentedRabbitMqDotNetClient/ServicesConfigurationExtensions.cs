@@ -58,6 +58,7 @@ namespace InstrumentedRabbitMqDotNetClient
             });
             services.AddScoped<IEventPublisher, EventPublisher>();
             services.AddTransient<IRabbitMQDiagnosticSource, RabbitMQDiagnosticSource>();
+            services.AddSingleton<IConnectionManager, ConnectionManager>();
             services.AddHostedService<RabbitMQSubscriberHostedService>();
         }
 
