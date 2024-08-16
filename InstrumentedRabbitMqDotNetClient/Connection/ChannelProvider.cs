@@ -6,10 +6,9 @@ namespace InstrumentedRabbitMqDotNetClient.Connection
     {
         private readonly IModel _channel;
 
-        public ChannelProvider(RabbitMQConfiguration configuration, IConnectionFactory connectionFactory)
+        public ChannelProvider(RabbitMQConfiguration configuration, IConnectionManager connectionManager)
         {
-            var connection = connectionFactory.CreateConnection();
-            _channel = connection.CreateModel();
+            _channel = connectionManager.Connection.CreateModel();
             _channel.ExchangeDeclare(exchange: configuration.Exchange, type: ExchangeType.Topic, true);
         }
 
